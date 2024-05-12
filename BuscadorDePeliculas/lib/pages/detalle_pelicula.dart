@@ -1,3 +1,4 @@
+import 'package:buscador_de_peliculas/main.dart';
 import 'package:buscador_de_peliculas/models/pelicula.dart';
 import 'package:buscador_de_peliculas/services/pelicula_service.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,18 @@ class DetailPelicula extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MainApp()),
+              );
+            },
+          ),
+          title: const Text('Lista de Películas'),
+        ),
         body: Center(
           child: FutureBuilder<Pelicula>(
             future: peliculaService.obtenerPeliculasPorId(id),
@@ -24,10 +37,13 @@ class DetailPelicula extends StatelessWidget {
                   children: [
                     Expanded(
                       child: SizedBox(
-                        child: Image.network(
-                          'https://image.tmdb.org/t/p/original${snapshot.data!.backdropPath} ?? No disponible',
-                          fit: BoxFit.cover,
-                        ),
+                        child: snapshot.data!.backdropPath != null &&
+                                snapshot.data!.backdropPath!.isNotEmpty
+                            ? Image.network(
+                                'https://image.tmdb.org/t/p/original${snapshot.data!.backdropPath}',
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset('assets/images/no-image.jpg'),
                       ),
                     ),
                     Opacity(
@@ -42,10 +58,13 @@ class DetailPelicula extends StatelessWidget {
                         children: <Widget>[
                           Expanded(
                             child: SizedBox(
-                              child: Image.network(
-                                'https://image.tmdb.org/t/p/original${snapshot.data!.imageUrl} ?? No disponible',
-                                fit: BoxFit.cover,
-                              ),
+                              child: snapshot.data!.imageUrl != null &&
+                                      snapshot.data!.imageUrl!.isNotEmpty
+                                  ? Image.network(
+                                      'https://image.tmdb.org/t/p/original${snapshot.data!.imageUrl}',
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.asset('assets/images/no-image.jpg'),
                             ),
                           ),
                           Expanded(

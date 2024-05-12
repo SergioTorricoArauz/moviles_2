@@ -1,4 +1,7 @@
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger('Pelicula');
 
 class Pelicula {
   final int? id;
@@ -28,12 +31,21 @@ class Pelicula {
   });
 
   factory Pelicula.fromJson(Map<String, dynamic> json) {
+    var releaseDate = json['release_date'];
+    DateTime? parsedDate;
+    if (releaseDate is String && releaseDate.isNotEmpty) {
+      try {
+        parsedDate = DateFormat('yyyy-MM-dd').parseStrict(releaseDate);
+      } catch (e) {
+        _logger.severe('Error parsing date: $e');
+        parsedDate = null;
+      }
+    }
+
     var pelicula = Pelicula(
       id: json['id'],
       title: json['title'],
-      releaseDate: json['release_date'] != null
-          ? DateFormat('yyyy-MM-dd').parse(json['release_date'])
-          : null,
+      releaseDate: parsedDate,
       runtime: json['runtime'],
       genres: json['genres'] != null
           ? List<String>.from(json['genres'].map((x) => x['name'].toString()))
@@ -47,38 +59,4 @@ class Pelicula {
     );
     return pelicula;
   }
-}
-
-class Director {
-  bool adult;
-  List<String> alsoKnownAs;
-  String biography;
-  DateTime birthday;
-  dynamic deathday;
-  int gender;
-  String homepage;
-  int id;
-  String imdbId;
-  String knownForDepartment;
-  String name;
-  String placeOfBirth;
-  double popularity;
-  String profilePath;
-
-  Director({
-    required this.adult,
-    required this.alsoKnownAs,
-    required this.biography,
-    required this.birthday,
-    required this.deathday,
-    required this.gender,
-    required this.homepage,
-    required this.id,
-    required this.imdbId,
-    required this.knownForDepartment,
-    required this.name,
-    required this.placeOfBirth,
-    required this.popularity,
-    required this.profilePath,
-  });
 }

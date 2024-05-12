@@ -25,6 +25,34 @@ class _MainAppState extends State<MainApp> {
   List<Pelicula> resultadosBusqueda = [];
 
   @override
+  void initState() {
+    super.initState();
+    searchController.addListener(_onSearchChanged);
+    yearController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    searchController.removeListener(_onSearchChanged);
+    searchController.dispose();
+    yearController.removeListener(_onSearchChanged);
+    yearController.dispose();
+    super.dispose();
+  }
+
+  _onSearchChanged() async {
+    if (searchController.text.isEmpty) {
+      setState(() {
+        resultadosBusqueda = [];
+      });
+    } else {
+      resultadosBusqueda =
+          await peliculaService.buscarPeliculas(searchController.text);
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
@@ -39,24 +67,6 @@ class _MainAppState extends State<MainApp> {
                     hintText: 'Buscar película...',
                   ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () async {
-                  String movieName = searchController.text;
-                  try {
-                    resultadosBusqueda =
-                        await peliculaService.buscarPeliculas(movieName);
-                    setState(() {});
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            'Ocurrió un error al buscar las películas: $e'),
-                      ),
-                    );
-                  }
-                },
               ),
               Expanded(
                 child: TextField(
@@ -94,15 +104,21 @@ class _MainAppState extends State<MainApp> {
                         : peliculas[index];
                     return Card(
                       child: ListTile(
-                        leading: Image.network(
-                            'https://image.tmdb.org/t/p/w200${pelicula.imageUrl}',
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.error)),
+                        leading: pelicula.imageUrl != null &&
+                                pelicula.imageUrl!.isNotEmpty
+                            ? Image.network(
+                                'https://image.tmdb.org/t/p/w200${pelicula.imageUrl}',
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.error),
+                              )
+                            : const Icon(Icons
+                                .error), // imagen por defecto si imageUrl es null
                         title: Text(pelicula.title ?? 'No disponible'),
                         subtitle: Text(
-                          DateFormat('yyyy-MM-dd').format(DateTime.parse(
-                              pelicula.releaseDate?.toString() ??
-                                  'No disponible')),
+                          pelicula.releaseDate != null
+                              ? DateFormat('yyyy-MM-dd')
+                                  .format(pelicula.releaseDate!)
+                              : 'No disponible',
                         ),
                         onTap: () {
                           int id = int.parse(pelicula.id.toString());
