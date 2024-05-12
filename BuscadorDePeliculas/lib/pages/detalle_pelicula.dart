@@ -17,7 +17,8 @@ class DetailPelicula extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon:
+                Image.network('https://img.icons8.com/color/48/themoviedb.png'),
             onPressed: () {
               Navigator.pushReplacement(
                 context,
@@ -81,15 +82,15 @@ class DetailPelicula extends StatelessWidget {
                                       style: const TextStyle(
                                           fontSize: 30, color: Colors.white),
                                     ),
+                                    const Text(
+                                      'Fecha de lanzamiento: ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                     Row(
                                       children: [
-                                        const Text(
-                                          'Fecha de lanzamiento: ',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
                                         Text(
                                           DateFormat('yyyy-MM-dd').format(
                                               DateTime.parse(snapshot
@@ -101,15 +102,15 @@ class DetailPelicula extends StatelessWidget {
                                         ),
                                       ],
                                     ),
+                                    const Text(
+                                      'Duración: ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                     Row(
                                       children: [
-                                        const Text(
-                                          'Duración: ',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
                                         Text(
                                           '${snapshot.data!.runtime?.toString() ?? 'No disponible'} minutos',
                                           style: const TextStyle(
@@ -117,20 +118,22 @@ class DetailPelicula extends StatelessWidget {
                                         ),
                                       ],
                                     ),
+                                    const Text(
+                                      'Géneros: ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                     Row(
                                       children: [
-                                        const Text(
-                                          'Géneros: ',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
+                                        Flexible(
+                                          child: Text(
+                                            snapshot.data!.genres?.join(', ') ??
+                                                'No disponible',
+                                            style: const TextStyle(
+                                                color: Colors.white),
                                           ),
-                                        ),
-                                        Text(
-                                          snapshot.data!.genres?.join(', ') ??
-                                              'No disponible',
-                                          style: const TextStyle(
-                                              color: Colors.white),
                                         ),
                                       ],
                                     ),
@@ -151,15 +154,15 @@ class DetailPelicula extends StatelessWidget {
                                         ),
                                       ],
                                     ),
+                                    const Text(
+                                      'Descripción: ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                     Row(
                                       children: [
-                                        const Text(
-                                          'Descripción: ',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
                                         Flexible(
                                           child: Text(
                                             snapshot.data!.overview ??
