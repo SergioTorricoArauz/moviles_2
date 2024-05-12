@@ -123,8 +123,7 @@ class DetailPelicula extends StatelessWidget {
   final int id;
 
   const DetailPelicula(
-      {Key? key, required this.peliculaService, required this.id})
-      : super(key: key);
+      {super.key, required this.peliculaService, required this.id});
 
   @override
   Widget build(BuildContext context) {
