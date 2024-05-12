@@ -30,7 +30,18 @@ class MainApp extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  String movieName = searchController
+                      .text; // Obtén el nombre de la película del controlador
+                  peliculaService.buscarPeliculas(
+                      movieName); // Busca la película con el nombre dado
+
+                  // Actualiza el estado para mostrar los resultados de la búsqueda
+                  (context as Element).markNeedsBuild();
+                },
+              ),
               Expanded(
                 child: TextField(
                   controller: yearController,
