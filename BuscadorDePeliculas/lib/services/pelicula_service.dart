@@ -45,24 +45,29 @@ class PeliculaService {
   }
 
   Future<List<Pelicula>> buscarPeliculas(String query) async {
-    var url = Uri.parse(
-        'https://api.themoviedb.org/3/search/movie?api_key=b284941f0d978f04beae57bd292c484d&query=$query');
-    var response = await http.get(url);
+    try {
+      var url = Uri.parse(
+          'https://api.themoviedb.org/3/search/movie?api_key=b284941f0d978f04beae57bd292c484d&query=$query');
+      var response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      var jsonResponse = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
 
-      // Comprueba si jsonResponse es nulo antes de intentar usarlo
-      if (jsonResponse == null) {
-        throw Exception('No se pudo buscar las películas');
+        // Comprueba si jsonResponse es nulo antes de intentar usarlo
+        if (jsonResponse == null) {
+          throw Exception('No se pudo buscar las películas');
+        }
+
+        var peliculas = (jsonResponse['results'] as List<dynamic>)
+            .map((item) => Pelicula.fromJson(item))
+            .toList();
+        return peliculas;
+      } else {
+        throw Exception(
+            'Solicitud fallida con estado: ${response.statusCode}.');
       }
-
-      var peliculas = (jsonResponse['results'] as List<dynamic>)
-          .map((item) => Pelicula.fromJson(item))
-          .toList();
-      return peliculas;
-    } else {
-      throw Exception('Solicitud fallida con estado: ${response.statusCode}.');
+    } catch (e) {
+      throw Exception('Ocurrió un error al realizar la solicitud: $e');
     }
   }
 

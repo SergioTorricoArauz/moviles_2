@@ -12,13 +12,14 @@ class MainApp extends StatelessWidget {
 
   final peliculaService = PeliculaService();
   final searchController = TextEditingController();
-  final yearController =
-      TextEditingController(); // Nuevo controlador para el año
+  final yearController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           title: Row(
             children: [
@@ -32,14 +33,22 @@ class MainApp extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.search),
-                onPressed: () {
+                onPressed: () async {
                   String movieName = searchController
                       .text; // Obtén el nombre de la película del controlador
-                  peliculaService.buscarPeliculas(
-                      movieName); // Busca la película con el nombre dado
-
-                  // Actualiza el estado para mostrar los resultados de la búsqueda
-                  (context as Element).markNeedsBuild();
+                  try {
+                    await peliculaService.buscarPeliculas(
+                        movieName); // Busca la película con el nombre dado
+                    // Actualiza el estado para mostrar los resultados de la búsqueda
+                    (context as Element).markNeedsBuild();
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Ocurrió un error al buscar las películas: $e'),
+                      ),
+                    );
+                  }
                 },
               ),
               Expanded(
@@ -48,13 +57,12 @@ class MainApp extends StatelessWidget {
                   decoration: const InputDecoration(
                     hintText: 'Año de lanzamiento...',
                   ),
-                  keyboardType: TextInputType.number, // Solo permite números
+                  keyboardType: TextInputType.number,
                 ),
               ),
               IconButton(
                 icon: const Icon(Icons.search),
                 onPressed: () {
-                  // Actualiza el estado para mostrar los resultados de la búsqueda
                   (context as Element).markNeedsBuild();
                 },
               ),
@@ -67,8 +75,8 @@ class MainApp extends StatelessWidget {
                 ? searchController.text.isEmpty
                     ? peliculaService.obtenerListaPeliculas()
                     : peliculaService.buscarPeliculas(searchController.text)
-                : peliculaService.buscarPeliculasPorAno(int.parse(yearController
-                    .text)), // Busca por año si hay un año ingresado
+                : peliculaService
+                    .buscarPeliculasPorAno(int.parse(yearController.text)),
             builder:
                 (BuildContext context, AsyncSnapshot<List<Pelicula>> snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
@@ -146,8 +154,7 @@ class DetailPelicula extends StatelessWidget {
                       ),
                     ),
                     Opacity(
-                      opacity:
-                          0.8, // Ajusta este valor para cambiar la opacidad
+                      opacity: 0.8,
                       child: Container(
                         color: Colors.black,
                       ),
@@ -176,9 +183,7 @@ class DetailPelicula extends StatelessWidget {
                                     Text(
                                       ' ${snapshot.data!.title ?? 'No disponible'}',
                                       style: const TextStyle(
-                                          fontSize: 30,
-                                          color: Colors
-                                              .white), // Título más grande
+                                          fontSize: 30, color: Colors.white),
                                     ),
                                     Row(
                                       children: [
