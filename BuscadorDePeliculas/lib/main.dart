@@ -1,6 +1,6 @@
 import 'package:buscador_de_peliculas/models/pelicula.dart';
 import 'package:buscador_de_peliculas/pages/detalle_pelicula.dart';
-import 'package:buscador_de_peliculas/services/pelicula_service.dart'; // Importa tu servicio aquí
+import 'package:buscador_de_peliculas/services/pelicula_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -8,13 +8,21 @@ void main() {
   runApp(MainApp());
 }
 
-class MainApp extends StatelessWidget {
-  MainApp({super.key});
+class MainApp extends StatefulWidget {
+  MainApp({Key? key}) : super(key: key);
 
+  @override
+  _MainAppState createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
   final peliculaService = PeliculaService();
   final searchController = TextEditingController();
   final yearController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int pagina = 1;
+  List<Pelicula> peliculas = [];
+  List<Pelicula> resultadosBusqueda = [];
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +43,11 @@ class MainApp extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.search),
                 onPressed: () async {
-                  String movieName = searchController
-                      .text; // Obtén el nombre de la película del controlador
+                  String movieName = searchController.text;
                   try {
-                    await peliculaService.buscarPeliculas(
-                        movieName); // Busca la película con el nombre dado
-                    // Actualiza el estado para mostrar los resultados de la búsqueda
-                    (context as Element).markNeedsBuild();
+                    resultadosBusqueda =
+                        await peliculaService.buscarPeliculas(movieName);
+                    setState(() {});
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -63,45 +69,43 @@ class MainApp extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.search),
-                onPressed: () {
-                  (context as Element).markNeedsBuild();
+                onPressed: () async {
+                  if (yearController.text.isNotEmpty) {
+                    resultadosBusqueda = await peliculaService
+                        .buscarPeliculasPorAno(int.parse(yearController.text));
+                    setState(() {});
+                  }
                 },
               ),
             ],
           ),
         ),
         body: Center(
-          child: FutureBuilder<List<Pelicula>>(
-            future: yearController.text.isEmpty
-                ? searchController.text.isEmpty
-                    ? peliculaService.obtenerListaPeliculas()
-                    : peliculaService.buscarPeliculas(searchController.text)
-                : peliculaService
-                    .buscarPeliculasPorAno(int.parse(yearController.text)),
-            builder:
-                (BuildContext context, AsyncSnapshot<List<Pelicula>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                }
-                var peliculas = snapshot.data!;
-                return ListView.builder(
-                  itemCount: peliculas.length,
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: ListView.builder(
+                  itemCount: resultadosBusqueda.isNotEmpty
+                      ? resultadosBusqueda.length
+                      : peliculas.length,
                   itemBuilder: (BuildContext context, int index) {
+                    Pelicula pelicula = resultadosBusqueda.isNotEmpty
+                        ? resultadosBusqueda[index]
+                        : peliculas[index];
                     return Card(
                       child: ListTile(
                         leading: Image.network(
-                            'https://image.tmdb.org/t/p/w200${peliculas[index].imageUrl}',
+                            'https://image.tmdb.org/t/p/w200${pelicula.imageUrl}',
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(Icons.error)),
-                        title: Text(peliculas[index].title ?? 'No disponible'),
+                        title: Text(pelicula.title ?? 'No disponible'),
                         subtitle: Text(
                           DateFormat('yyyy-MM-dd').format(DateTime.parse(
-                              peliculas[index].releaseDate?.toString() ??
+                              pelicula.releaseDate?.toString() ??
                                   'No disponible')),
                         ),
                         onTap: () {
-                          int id = int.parse(peliculas[index].id.toString());
+                          int id = int.parse(pelicula.id.toString());
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -115,11 +119,20 @@ class MainApp extends StatelessWidget {
                       ),
                     );
                   },
-                );
-              } else {
-                return const CircularProgressIndicator();
-              }
-            },
+                ),
+              ),
+              ElevatedButton(
+                child: const Text('Cargar más'),
+                onPressed: () async {
+                  pagina++;
+                  List<Pelicula> masPeliculas =
+                      await peliculaService.obtenerListaPeliculas(pagina);
+                  setState(() {
+                    peliculas.addAll(masPeliculas);
+                  });
+                },
+              ),
+            ],
           ),
         ),
       ),

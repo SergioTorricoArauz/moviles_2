@@ -22,9 +22,9 @@ class PeliculaService {
     }
   }
 
-  Future<List<Pelicula>> obtenerListaPeliculas() async {
+  Future<List<Pelicula>> obtenerListaPeliculas(int pagina) async {
     var url = Uri.parse(
-        'https://api.themoviedb.org/3/movie/top_rated?api_key=b284941f0d978f04beae57bd292c484d');
+        'https://api.themoviedb.org/3/movie/top_rated?api_key=b284941f0d978f04beae57bd292c484d&page=$pagina');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
