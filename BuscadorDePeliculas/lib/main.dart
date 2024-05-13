@@ -2,10 +2,21 @@ import 'package:buscador_de_peliculas/models/pelicula.dart';
 import 'package:buscador_de_peliculas/pages/detalle_pelicula.dart';
 import 'package:buscador_de_peliculas/services/pelicula_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:logging/logging.dart';
 
 void main() {
+  _setupLogging();
   runApp(MainApp());
+}
+
+void _setupLogging() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((rec) {
+    Logger('MainApp').info('${rec.level.name}: ${rec.time}: ${rec.message}');
+  });
 }
 
 class MainApp extends StatefulWidget {
@@ -27,8 +38,25 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
+    _retrieveSearch();
     searchController.addListener(_onSearchChanged);
     yearController.addListener(_onSearchChanged);
+  }
+
+  _retrieveSearch() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastSearch = prefs.getString('last_search');
+    String? lastYearSearch = prefs.getString('last_year_search');
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (lastSearch != null) {
+        searchController.text = lastSearch;
+      }
+
+      if (lastYearSearch != null) {
+        yearController.text = lastYearSearch;
+      }
+    });
   }
 
   @override
@@ -41,14 +69,31 @@ class _MainAppState extends State<MainApp> {
   }
 
   _onSearchChanged() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     if (searchController.text.isEmpty) {
       setState(() {
         resultadosBusqueda = [];
       });
+
+      // Verificar si la búsqueda está almacenada
+      if (prefs.containsKey('last_search')) {
+        // La búsqueda está almacenada
+        Logger('MainApp').info('La búsqueda está almacenada.');
+      } else {
+        // La búsqueda no está almacenada
+        Logger('MainApp').info('La búsqueda no está almacenada.');
+      }
     } else {
       resultadosBusqueda =
           await peliculaService.buscarPeliculas(searchController.text);
       setState(() {});
+
+      // Almacenar la búsqueda en el almacenamiento local
+      prefs.setString('last_search', searchController.text);
+
+      // Registrar la búsqueda almacenada
+      Logger('MainApp').info('Búsqueda almacenada: ${searchController.text}');
     }
   }
 
