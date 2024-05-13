@@ -1,8 +1,7 @@
-import 'dart:async';
+import 'dart:math';
 
 import 'package:buscador_de_peliculas/models/pelicula.dart';
 import 'package:buscador_de_peliculas/pages/detalle_pelicula.dart';
-import 'package:buscador_de_peliculas/pages/pelicula_handler_selection.dart';
 import 'package:buscador_de_peliculas/services/pelicula_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -37,8 +36,6 @@ class _MainAppState extends State<MainApp> {
   int pagina = 1;
   List<Pelicula> peliculas = [];
   List<Pelicula> resultadosBusqueda = [];
-  PeliculaSelectionHandler peliculaSelectionHandler =
-      PeliculaSelectionHandler();
   List<String> historialBusquedas = [];
   List<String> historialBusquedasPorAno = [];
 
@@ -85,10 +82,6 @@ class _MainAppState extends State<MainApp> {
         yearController.text = lastYearSearch;
       }
     });
-  }
-
-  void onPeliculaSelected(Pelicula pelicula) {
-    peliculaSelectionHandler.onPeliculaSelected(pelicula);
   }
 
   @override
@@ -183,13 +176,25 @@ class _MainAppState extends State<MainApp> {
                   });
                 },
               ),
+              if (mostrarHistorialBusquedas)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: historialBusquedas.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        title: Text(historialBusquedas[index]),
+                      );
+                    },
+                  ),
+                ),
             ],
           ),
         ),
         body: Center(
           child: Column(
             children: <Widget>[
-              Expanded(
+              Flexible(
+                flex: max(3, historialBusquedas.length),
                 child: ListView.builder(
                   itemCount: historialBusquedas.length,
                   itemBuilder: (BuildContext context, int index) {
@@ -207,7 +212,12 @@ class _MainAppState extends State<MainApp> {
                   },
                 ),
               ),
-              Expanded(
+              Flexible(
+                flex: max(
+                    1,
+                    resultadosBusqueda.isNotEmpty
+                        ? resultadosBusqueda.length
+                        : peliculas.length),
                 child: ListView.builder(
                   itemCount: resultadosBusqueda.isNotEmpty
                       ? resultadosBusqueda.length
