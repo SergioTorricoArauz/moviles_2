@@ -1,5 +1,6 @@
 import 'package:buscador_de_peliculas/models/pelicula.dart';
 import 'package:buscador_de_peliculas/pages/detalle_pelicula.dart';
+import 'package:buscador_de_peliculas/pages/pelicula_handler_selection.dart';
 import 'package:buscador_de_peliculas/services/pelicula_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -34,13 +35,15 @@ class _MainAppState extends State<MainApp> {
   int pagina = 1;
   List<Pelicula> peliculas = [];
   List<Pelicula> resultadosBusqueda = [];
+  PeliculaSelectionHandler peliculaSelectionHandler =
+      PeliculaSelectionHandler();
+  List<String> historialBusquedas = [];
 
   @override
   void initState() {
     super.initState();
     _retrieveSearch();
-    searchController.addListener(_onSearchChanged);
-    yearController.addListener(_onSearchChanged);
+    // searchController.addListener(_onSearchChanged);
   }
 
   _retrieveSearch() async {
@@ -59,15 +62,18 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
+  void onPeliculaSelected(Pelicula pelicula) {
+    peliculaSelectionHandler.onPeliculaSelected(pelicula);
+  }
+
   @override
   void dispose() {
-    searchController.removeListener(_onSearchChanged);
+    // searchController.removeListener(_onSearchChanged);
     searchController.dispose();
-    yearController.removeListener(_onSearchChanged);
-    yearController.dispose();
     super.dispose();
   }
 
+/*
   _onSearchChanged() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -75,25 +81,60 @@ class _MainAppState extends State<MainApp> {
       setState(() {
         resultadosBusqueda = [];
       });
-
-      // Verificar si la búsqueda está almacenada
-      if (prefs.containsKey('last_search')) {
-        // La búsqueda está almacenada
-        Logger('MainApp').info('La búsqueda está almacenada.');
-      } else {
-        // La búsqueda no está almacenada
-        Logger('MainApp').info('La búsqueda no está almacenada.');
-      }
     } else {
       resultadosBusqueda =
           await peliculaService.buscarPeliculas(searchController.text);
       setState(() {});
 
       // Almacenar la búsqueda en el almacenamiento local
-      prefs.setString('last_search', searchController.text);
+      List<String> historialBusquedas =
+          prefs.getStringList('historial_busquedas') ?? [];
+      historialBusquedas.add(searchController.text);
+      prefs.setStringList('historial_busquedas', historialBusquedas);
 
       // Registrar la búsqueda almacenada
       Logger('MainApp').info('Búsqueda almacenada: ${searchController.text}');
+    }
+  }
+*/
+
+  _onSearchButtonPressed() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (searchController.text.isNotEmpty) {
+      resultadosBusqueda =
+          await peliculaService.buscarPeliculas(searchController.text);
+      setState(() {});
+
+      // Almacenar la búsqueda en el almacenamiento local
+      List<String> historialBusquedas =
+          prefs.getStringList('historial_busquedas') ?? [];
+      historialBusquedas.add(searchController.text);
+      prefs.setStringList('historial_busquedas', historialBusquedas);
+
+      // Registrar la búsqueda almacenada
+      Logger('MainApp').info('Búsqueda almacenada: ${searchController.text}');
+    }
+  }
+
+  _onYearSearchButtonPressed() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (yearController.text.isNotEmpty) {
+      resultadosBusqueda = await peliculaService
+          .buscarPeliculasPorAno(int.parse(yearController.text));
+      setState(() {});
+
+      // Almacenar la búsqueda en el almacenamiento local
+      List<String> historialBusquedasPorAno =
+          prefs.getStringList('historial_busquedas_por_ano') ?? [];
+      historialBusquedasPorAno.add(yearController.text);
+      prefs.setStringList(
+          'historial_busquedas_por_ano', historialBusquedasPorAno);
+
+      // Registrar la búsqueda almacenada
+      Logger('MainApp')
+          .info('Búsqueda por año almacenada: ${yearController.text}');
     }
   }
 
@@ -113,6 +154,10 @@ class _MainAppState extends State<MainApp> {
                   ),
                 ),
               ),
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: _onSearchButtonPressed,
+              ),
               Expanded(
                 child: TextField(
                   controller: yearController,
@@ -124,13 +169,7 @@ class _MainAppState extends State<MainApp> {
               ),
               IconButton(
                 icon: const Icon(Icons.search),
-                onPressed: () async {
-                  if (yearController.text.isNotEmpty) {
-                    resultadosBusqueda = await peliculaService
-                        .buscarPeliculasPorAno(int.parse(yearController.text));
-                    setState(() {});
-                  }
-                },
+                onPressed: _onYearSearchButtonPressed,
               ),
             ],
           ),
