@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:buscador_de_peliculas/models/pelicula.dart';
 import 'package:buscador_de_peliculas/pages/detalle_pelicula.dart';
 import 'package:buscador_de_peliculas/pages/pelicula_handler_selection.dart';
@@ -38,12 +40,35 @@ class _MainAppState extends State<MainApp> {
   PeliculaSelectionHandler peliculaSelectionHandler =
       PeliculaSelectionHandler();
   List<String> historialBusquedas = [];
+  List<String> historialBusquedasPorAno = [];
+
+  FocusNode myFocusNode = FocusNode();
+  bool mostrarHistorialBusquedas = false;
 
   @override
   void initState() {
     super.initState();
     _retrieveSearch();
-    // searchController.addListener(_onSearchChanged);
+    _retrieveSearchHistory();
+
+    myFocusNode.addListener(() {
+      if (myFocusNode.hasFocus) {
+        setState(() {
+          mostrarHistorialBusquedas = true;
+        });
+      } else {
+        setState(() {
+          mostrarHistorialBusquedas = false;
+        });
+      }
+    });
+  }
+
+  _retrieveSearchHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    historialBusquedas = prefs.getStringList('historial_busquedas') ?? [];
+    historialBusquedasPorAno =
+        prefs.getStringList('historial_busquedas_por_ano') ?? [];
   }
 
   _retrieveSearch() async {
@@ -68,35 +93,9 @@ class _MainAppState extends State<MainApp> {
 
   @override
   void dispose() {
-    // searchController.removeListener(_onSearchChanged);
     searchController.dispose();
     super.dispose();
   }
-
-/*
-  _onSearchChanged() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if (searchController.text.isEmpty) {
-      setState(() {
-        resultadosBusqueda = [];
-      });
-    } else {
-      resultadosBusqueda =
-          await peliculaService.buscarPeliculas(searchController.text);
-      setState(() {});
-
-      // Almacenar la búsqueda en el almacenamiento local
-      List<String> historialBusquedas =
-          prefs.getStringList('historial_busquedas') ?? [];
-      historialBusquedas.add(searchController.text);
-      prefs.setStringList('historial_busquedas', historialBusquedas);
-
-      // Registrar la búsqueda almacenada
-      Logger('MainApp').info('Búsqueda almacenada: ${searchController.text}');
-    }
-  }
-*/
 
   _onSearchButtonPressed() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -107,13 +106,18 @@ class _MainAppState extends State<MainApp> {
       setState(() {});
 
       // Almacenar la búsqueda en el almacenamiento local
-      List<String> historialBusquedas =
-          prefs.getStringList('historial_busquedas') ?? [];
+      historialBusquedas = prefs.getStringList('historial_busquedas') ?? [];
       historialBusquedas.add(searchController.text);
       prefs.setStringList('historial_busquedas', historialBusquedas);
 
       // Registrar la búsqueda almacenada
       Logger('MainApp').info('Búsqueda almacenada: ${searchController.text}');
+    } else {
+      // Si el campo de búsqueda está vacío, selecciona la última búsqueda del historial
+      if (historialBusquedas.isNotEmpty) {
+        searchController.text = historialBusquedas.last;
+        _onSearchButtonPressed();
+      }
     }
   }
 
@@ -126,7 +130,7 @@ class _MainAppState extends State<MainApp> {
       setState(() {});
 
       // Almacenar la búsqueda en el almacenamiento local
-      List<String> historialBusquedasPorAno =
+      historialBusquedasPorAno =
           prefs.getStringList('historial_busquedas_por_ano') ?? [];
       historialBusquedasPorAno.add(yearController.text);
       prefs.setStringList(
@@ -171,12 +175,38 @@ class _MainAppState extends State<MainApp> {
                 icon: const Icon(Icons.search),
                 onPressed: _onYearSearchButtonPressed,
               ),
+              IconButton(
+                icon: const Icon(Icons.history),
+                onPressed: () {
+                  setState(() {
+                    mostrarHistorialBusquedas = !mostrarHistorialBusquedas;
+                  });
+                },
+              ),
             ],
           ),
         ),
         body: Center(
           child: Column(
             children: <Widget>[
+              Expanded(
+                child: ListView.builder(
+                  itemCount: historialBusquedas.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () async {
+                        String busquedaSeleccionada = historialBusquedas[index];
+                        resultadosBusqueda = await peliculaService
+                            .buscarPeliculas(busquedaSeleccionada);
+                        setState(() {});
+                      },
+                      child: ListTile(
+                        title: Text(historialBusquedas[index]),
+                      ),
+                    );
+                  },
+                ),
+              ),
               Expanded(
                 child: ListView.builder(
                   itemCount: resultadosBusqueda.isNotEmpty
