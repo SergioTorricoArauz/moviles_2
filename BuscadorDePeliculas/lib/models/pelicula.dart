@@ -1,62 +1,33 @@
-import 'package:intl/intl.dart';
-import 'package:logging/logging.dart';
+// To parse this JSON data, do
+//
+//     final pelicula = peliculaFromJson(jsonString);
 
-final _logger = Logger('Pelicula');
+import 'dart:convert';
+
+Pelicula peliculaFromJson(String str) => Pelicula.fromJson(json.decode(str));
+
+String peliculaToJson(Pelicula data) => json.encode(data.toJson());
 
 class Pelicula {
-  final int? id;
-  String? title;
-  String? name;
-  DateTime? releaseDate;
-  int? runtime;
-  List<String>? genres;
-  String? overview;
-  String? imageUrl;
-  String? backdropPath;
-  double? popularity;
-  double? voteAverage;
+  int? id;
+  String nombre;
+  String imagen;
 
   Pelicula({
     this.id,
-    this.title,
-    this.name,
-    this.releaseDate,
-    this.runtime,
-    this.genres,
-    this.overview,
-    this.imageUrl,
-    this.backdropPath,
-    this.popularity,
-    this.voteAverage,
+    required this.nombre,
+    required this.imagen,
   });
 
-  factory Pelicula.fromJson(Map<String, dynamic> json) {
-    var releaseDate = json['release_date'];
-    DateTime? parsedDate;
-    if (releaseDate is String && releaseDate.isNotEmpty) {
-      try {
-        parsedDate = DateFormat('yyyy-MM-dd').parseStrict(releaseDate);
-      } catch (e) {
-        _logger.severe('Error parsing date: $e');
-        parsedDate = null;
-      }
-    }
+  factory Pelicula.fromJson(Map<String, dynamic> json) => Pelicula(
+        id: json["id"],
+        nombre: json["nombre"],
+        imagen: json["imagen"],
+      );
 
-    var pelicula = Pelicula(
-      id: json['id'],
-      title: json['title'],
-      releaseDate: parsedDate,
-      runtime: json['runtime'],
-      genres: json['genres'] != null
-          ? List<String>.from(json['genres'].map((x) => x['name'].toString()))
-          : [],
-      name: json['name'],
-      overview: json['overview'],
-      imageUrl: json['poster_path'],
-      backdropPath: json['backdrop_path'],
-      popularity: json['popularity'],
-      voteAverage: json['vote_average'],
-    );
-    return pelicula;
-  }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "nombre": nombre,
+        "imagen": imagen,
+      };
 }
