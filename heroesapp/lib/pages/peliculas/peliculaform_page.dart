@@ -65,18 +65,13 @@ class _FormValidadoPageState extends State<PeliculaForm> {
     return ElevatedButton(
       onPressed: () async {
         if (_formKey.currentState!.validate()) {
-          // Crea una nueva instancia de Pelicula
           Pelicula nuevaPelicula = Pelicula(
             nombre: _nombreController.text,
             imagen: _imagenController.text,
           );
 
-          // Llama al método de inserción de PeliculaBLL
-          // Llama al método de inserción de PeliculaBLL
           await PeliculaBLL.insert(nuevaPelicula);
-          // Verifica si el widget todavía está en el árbol de widgets
           if (mounted) {
-            // Redirige a la pagina de peliculas
             Navigator.pushNamed(context, '/pelicula/list');
           }
         }

@@ -18,9 +18,9 @@ class _PeliculaListPageState extends State<PeliculaListPage> {
         title: const Text('Lista de Peliculas'),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.movie),
             onPressed: () async {
-              //await PeliculaDAL.deleteDB();
+              Navigator.pushNamed(context, '/');
               setState(() {});
             },
           ),
@@ -71,20 +71,17 @@ class _PeliculaListPageState extends State<PeliculaListPage> {
               if (snapshot.hasData) {
                 Pelicula? pelicula = snapshot.data;
                 return Card(
-                  // Agregado el widget Card
                   child: ListTile(
                     title: Text(pelicula?.nombre ?? 'Sin nombre'),
                     subtitle: pelicula?.imagen != null
                         ? SizedBox(
-                            width: 100.0, // Ancho de la imagen
-                            height: 100.0, // Altura de la imagen
+                            width: 100.0,
+                            height: 100.0,
                             child: pelicula?.imagen != null &&
                                     pelicula!.imagen.startsWith('http')
                                 ? Image.network(pelicula.imagen,
-                                    fit: BoxFit
-                                        .cover) // Si la imagen es una URL (comienza con 'http'), la carga y ajusta al tamaño del SizedBox
-                                : const Text(
-                                    'Imagen no disponible'), // Si la imagen no es una URL, muestra un texto que dice 'Imagen no disponible'
+                                    fit: BoxFit.cover)
+                                : const Text('Imagen no disponible'),
                           )
                         : const Text('Sin imagen'),
                     trailing: IconButton(

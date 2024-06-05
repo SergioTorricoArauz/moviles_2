@@ -1,5 +1,4 @@
 import 'package:buscador_de_peliculas/bll/personaje_bll.dart';
-import 'package:buscador_de_peliculas/dal/personaje_dal.dart';
 import 'package:buscador_de_peliculas/models/personaje.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +18,9 @@ class _PersonajeListPageState extends State<PersonajeListPage> {
           title: const Text('Lista de Personajes'),
           actions: <Widget>[
             IconButton(
-              icon: const Icon(Icons.delete),
+              icon: const Icon(Icons.movie),
               onPressed: () async {
-                await PersonajeDAL.deleteDB();
+                Navigator.pushNamed(context, '/pelicula/list');
                 setState(() {});
               },
             ),
