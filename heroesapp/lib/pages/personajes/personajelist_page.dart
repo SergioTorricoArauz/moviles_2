@@ -1,5 +1,6 @@
 import 'package:buscador_de_peliculas/bll/personaje_bll.dart';
 import 'package:buscador_de_peliculas/models/personaje.dart';
+import 'package:buscador_de_peliculas/pages/personajes/detallepersonaje_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -76,28 +77,40 @@ class _PersonajeListPageState extends State<PersonajeListPage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 Personaje? personaje = snapshot.data;
-                return Center(
-                  child: Card(
-                    child: SizedBox(
-                      width: 250.0,
-                      height: 150.0,
-                      child: ListTile(
-                        title: Text(personaje?.nombre ?? 'Sin nombre'),
-                        subtitle: Image.network(
-                          personaje?.imagen ?? 'url_de_imagen_por_defecto',
-                          width: 100, // Ancho de la imagen
-                          height: 100, // Altura de la imagen
-                          fit: BoxFit
-                              .cover, // Esto es para que la imagen se ajuste al tamaño especificado
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () async {
-                            if (personaje?.id != null) {
-                              await PersonajeBLL.delete(personaje!.id ?? 0);
-                              setState(() {});
-                            }
-                          },
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PersonajeDetallePage(id: personaje?.id ?? 0),
+                      ),
+                    );
+                  },
+                  child: Center(
+                    child: Card(
+                      child: SizedBox(
+                        width: 250.0,
+                        height: 150.0,
+                        child: ListTile(
+                          title: Text(
+                              '${personaje?.id ?? 'Sin ID'}${personaje?.nombre ?? 'Sin nombre'}'),
+                          subtitle: Image.network(
+                            personaje?.imagen ?? 'url_de_imagen_por_defecto',
+                            width: 100, // Ancho de la imagen
+                            height: 100, // Altura de la imagen
+                            fit: BoxFit
+                                .cover, // Esto es para que la imagen se ajuste al tamaño especificado
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              if (personaje?.id != null) {
+                                await PersonajeBLL.delete(personaje!.id ?? 0);
+                                setState(() {});
+                              }
+                            },
+                          ),
                         ),
                       ),
                     ),

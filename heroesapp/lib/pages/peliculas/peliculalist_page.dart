@@ -72,7 +72,7 @@ class _PeliculaListPageState extends State<PeliculaListPage> {
                 Pelicula? pelicula = snapshot.data;
                 return Center(
                   child: SizedBox(
-                    width: 250.0,
+                    width: 280.0,
                     height: 150.0,
                     child: Center(
                       child: Card(
@@ -81,11 +81,12 @@ class _PeliculaListPageState extends State<PeliculaListPage> {
                             Navigator.pushNamed(
                                 context, '/pelicula/form/${pelicula!.id}');
                           },
-                          title: Text(pelicula?.nombre ?? 'Sin nombre'),
+                          title: Text(
+                              '${pelicula?.id ?? 'Sin ID'}${pelicula?.nombre ?? 'Sin nombre'}'), // Aquí se muestra el ID
                           subtitle: pelicula?.imagen != null
                               ? SizedBox(
                                   width: 100.0,
-                                  height: 100.0,
+                                  height: 90.0,
                                   child: pelicula?.imagen != null &&
                                           pelicula!.imagen.startsWith('http')
                                       ? Center(

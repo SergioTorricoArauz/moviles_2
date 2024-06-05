@@ -1,8 +1,5 @@
 import 'package:buscador_de_peliculas/models/personaje.dart';
 import 'package:buscador_de_peliculas/providers/database_provider.dart';
-import 'package:sqflite/sqflite.dart';
-// ignore: depend_on_referenced_packages
-import 'package:path/path.dart';
 
 class PersonajeDAL {
   static Future<int> insert(Personaje personaje) async {
@@ -38,9 +35,11 @@ class PersonajeDAL {
     return res;
   }
 
-//Metodo para eliminar toda la base de datos
-  static Future<void> deleteDB() async {
-    String path = join(await getDatabasesPath(), "dbheroes.db");
-    await deleteDatabase(path);
+  static Future<List<int>> selectIds() async {
+    final db = await DatabaseProvider.database;
+    var res = await db.query("personaje", columns: ["idPelicula"]);
+    List<int> list =
+        res.isNotEmpty ? res.map((c) => c["idPelicula"] as int).toList() : [];
+    return list;
   }
 }

@@ -241,28 +241,68 @@ class _PersonajeFormState extends State<PersonajeForm> {
               return null;
             },
           ),
-          TextFormField(
-            controller: _idPeliculaController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Id Película',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese un id de película';
+          FutureBuilder<List<int>>(
+            future: PersonajeBLL.selectAllIds(),
+            builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
+              if (snapshot.hasData) {
+                return DropdownButtonFormField<int>(
+                  decoration: const InputDecoration(
+                    labelText: 'Id Película',
+                  ),
+                  items: snapshot.data!.asMap().entries.map((entry) {
+                    int idx = entry.key;
+                    int id = entry.value;
+                    return DropdownMenuItem<int>(
+                      value: idx,
+                      child: Text(id.toString()),
+                    );
+                  }).toList(),
+                  onChanged: (int? newValue) {
+                    setState(() {
+                      _idPeliculaController.text =
+                          snapshot.data![newValue!].toString();
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Por favor seleccione un id de película';
+                    }
+                    return null;
+                  },
+                );
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                return const CircularProgressIndicator();
               }
-              return null;
             },
           ),
-          TextFormField(
-            controller: _idTipoController,
-            keyboardType: TextInputType.number,
+          DropdownButtonFormField<int>(
             decoration: const InputDecoration(
-              labelText: 'Id Tipo',
+              labelText: 'Tipo',
             ),
+            items: const [
+              DropdownMenuItem(
+                value: 1,
+                child: Text("Héroe"),
+              ),
+              DropdownMenuItem(
+                value: 2,
+                child: Text("Villano"),
+              ),
+              DropdownMenuItem(
+                value: 3,
+                child: Text("Antivillano"),
+              ),
+            ],
+            onChanged: (int? newValue) {
+              setState(() {
+                _idTipoController.text = newValue.toString();
+              });
+            },
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese un id de tipo';
+              if (value == null) {
+                return 'Por favor seleccione un tipo';
               }
               return null;
             },
@@ -279,7 +319,7 @@ class _PersonajeFormState extends State<PersonajeForm> {
         if (_formKey.currentState!.validate()) {
           Personaje nuevoPersonaje = Personaje(
             nombre: _nombreController.text,
-            nombreSuperheroe: _nombreController.text,
+            nombreSuperheroe: _nombreSuperheroeController.text,
             edad: int.parse(_edadController.text),
             imagen: _imagenController.text,
             peso: int.parse(_pesoController.text),
@@ -303,7 +343,7 @@ class _PersonajeFormState extends State<PersonajeForm> {
           }
 
           if (mounted) {
-            Navigator.pushNamed(context, '/personaje/list');
+            Navigator.pushNamed(context, '/');
           }
         }
       },

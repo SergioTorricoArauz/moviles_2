@@ -28,4 +28,9 @@ class PersonajeBLL {
   static Future<int> delete(int id) async {
     return await PersonajeDAL.delete(id);
   }
+
+  static Future<List<int>> selectAllIds() async {
+    var res = await PersonajeDAL.selectIds();
+    return res;
+  }
 }
