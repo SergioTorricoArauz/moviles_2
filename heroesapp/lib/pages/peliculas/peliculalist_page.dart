@@ -70,28 +70,42 @@ class _PeliculaListPageState extends State<PeliculaListPage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 Pelicula? pelicula = snapshot.data;
-                return Card(
-                  child: ListTile(
-                    title: Text(pelicula?.nombre ?? 'Sin nombre'),
-                    subtitle: pelicula?.imagen != null
-                        ? SizedBox(
-                            width: 100.0,
-                            height: 100.0,
-                            child: pelicula?.imagen != null &&
-                                    pelicula!.imagen.startsWith('http')
-                                ? Image.network(pelicula.imagen,
-                                    fit: BoxFit.cover)
-                                : const Text('Imagen no disponible'),
-                          )
-                        : const Text('Sin imagen'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () async {
-                        if (pelicula?.id != null) {
-                          await PeliculaBLL.delete(pelicula!.id ?? 0);
-                          setState(() {});
-                        }
-                      },
+                return Center(
+                  child: SizedBox(
+                    width: 250.0,
+                    height: 150.0,
+                    child: Center(
+                      child: Card(
+                        child: ListTile(
+                          onTap: () {
+                            Navigator.pushNamed(
+                                context, '/pelicula/form/${pelicula!.id}');
+                          },
+                          title: Text(pelicula?.nombre ?? 'Sin nombre'),
+                          subtitle: pelicula?.imagen != null
+                              ? SizedBox(
+                                  width: 100.0,
+                                  height: 100.0,
+                                  child: pelicula?.imagen != null &&
+                                          pelicula!.imagen.startsWith('http')
+                                      ? Center(
+                                          child: Image.network(pelicula.imagen,
+                                              fit: BoxFit.cover),
+                                        )
+                                      : const Text('Imagen no disponible'),
+                                )
+                              : const Text('Sin imagen'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              if (pelicula?.id != null) {
+                                await PeliculaBLL.delete(pelicula!.id ?? 0);
+                                setState(() {});
+                              }
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 );

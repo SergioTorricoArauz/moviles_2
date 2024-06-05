@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:buscador_de_peliculas/pages/peliculas/peliculaform_page.dart';
 import 'package:buscador_de_peliculas/pages/peliculas/peliculalist_page.dart';
+import 'package:buscador_de_peliculas/pages/personajes/personajeform_page.dart';
 import 'package:buscador_de_peliculas/pages/personajes/personajelist_page.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -27,19 +28,46 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       onGenerateRoute: (RouteSettings settings) {
-        var routes = <String, WidgetBuilder>{
-          '/': (context) => const PersonajeListPage(),
-          '/personaje/form': (context) => const PersonajeListPage(),
-          '/personaje/form/:id': (context) => const PersonajeListPage(),
-          '/pelicula/form': (context) => const PeliculaForm(),
-          '/pelicula/list': (context) => const PeliculaListPage(),
-        };
-        WidgetBuilder? builder = routes[settings.name];
-        if (builder == null) {
-          // Handle unknown route
-          throw Exception('Invalid route: ${settings.name}');
+        // Dividir la ruta en partes
+        var parts = settings.name?.split('/') ?? [];
+
+        if (parts.length > 1) {
+          switch (parts[1]) {
+            // Cambiar a parts[1]
+            case '':
+              return MaterialPageRoute(
+                  builder: (ctx) => const PersonajeListPage());
+            case 'personaje':
+              if (parts.length > 2 && parts[2] == 'form') {
+                var id = parts.length > 3 ? int.tryParse(parts[3]) : null;
+                return MaterialPageRoute(
+                    builder: (ctx) => PersonajeForm(id: id));
+              } else if (parts.length > 2 && parts[2] == 'list') {
+                return MaterialPageRoute(
+                    builder: (ctx) => const PersonajeListPage());
+              } else if (parts.length == 2 && parts[1] == 'form') {
+                return MaterialPageRoute(
+                    builder: (ctx) => const PersonajeForm());
+              }
+              break;
+            case 'pelicula':
+              if (parts.length > 2 && parts[2] == 'form') {
+                var id = parts.length > 3 ? int.tryParse(parts[3]) : null;
+                return MaterialPageRoute(
+                    builder: (ctx) => PeliculaForm(idPelicula: id));
+              } else if (parts.length > 2 && parts[2] == 'list') {
+                return MaterialPageRoute(
+                    builder: (ctx) => const PeliculaListPage());
+              } else if (parts.length == 2 && parts[2] == 'form') {
+                return MaterialPageRoute(
+                    builder: (ctx) => const PeliculaForm());
+              }
+              break;
+          }
         }
-        return MaterialPageRoute(builder: (ctx) => builder(ctx));
+
+        // Si ninguna ruta coincide, lanzar una excepción
+        throw Exception('Invalid route: ${settings.name}');
       },
     );
   }
