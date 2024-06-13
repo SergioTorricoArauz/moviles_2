@@ -28,4 +28,13 @@ class TipoBLL {
   static Future<int> delete(int id) async {
     return await TipoDAL.delete(id);
   }
+
+  static Future<List<int>> getTipos() async {
+    var res = await TipoDAL.selectIds();
+    return res;
+  }
+
+  static getNombrePorId(int id) {
+    return selectById(id).then((tipo) => tipo.nombre);
+  }
 }

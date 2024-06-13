@@ -1,5 +1,7 @@
 import 'package:buscador_de_peliculas/bll/personaje_bll.dart';
+import 'package:buscador_de_peliculas/bll/tipo_bll.dart';
 import 'package:buscador_de_peliculas/models/personaje.dart';
+import 'package:buscador_de_peliculas/models/tipo.dart';
 import 'package:flutter/material.dart';
 
 class PersonajeForm extends StatefulWidget {
@@ -26,7 +28,6 @@ class _PersonajeFormState extends State<PersonajeForm> {
   final _agilidadController = TextEditingController();
   final _resistenciaController = TextEditingController();
   final _velocidadController = TextEditingController();
-  final _idPeliculaController = TextEditingController();
   final _idTipoController = TextEditingController();
   Personaje? personaje;
 
@@ -34,6 +35,18 @@ class _PersonajeFormState extends State<PersonajeForm> {
   void initState() {
     super.initState();
     _loadPersonaje();
+  }
+
+  Future<List<Tipo>> getTipos() async {
+    List<int> ids = await TipoBLL.getTipos();
+    return Future.wait(ids.map((int id) async {
+      String nombre = await TipoBLL.getNombrePorId(id);
+      return Tipo(id: id, nombre: nombre);
+    }).toList());
+  }
+
+  bool isNumeric(String s) {
+    return double.tryParse(s) != null;
   }
 
   _loadPersonaje() async {
@@ -52,7 +65,6 @@ class _PersonajeFormState extends State<PersonajeForm> {
       _agilidadController.text = personaje!.agilidad.toString();
       _resistenciaController.text = personaje!.resistencia.toString();
       _velocidadController.text = personaje!.velocidad.toString();
-      _idPeliculaController.text = personaje!.idPelicula.toString();
       _idTipoController.text = personaje!.idTipo.toString();
     }
   }
@@ -68,247 +80,257 @@ class _PersonajeFormState extends State<PersonajeForm> {
   }
 
   getForm(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          TextFormField(
-            controller: _nombreController,
-            keyboardType: TextInputType.text,
-            decoration: const InputDecoration(
-              labelText: 'Nombre',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese un nombre';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _nombreSuperheroeController,
-            keyboardType: TextInputType.text,
-            decoration: const InputDecoration(
-              labelText: 'Nombre Superheroe',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese un nombre de superhéroe';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _edadController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Edad',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese una edad';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _imagenController,
-            keyboardType: TextInputType.text,
-            decoration: const InputDecoration(
-              labelText: 'Imagen',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese una Imagen';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _pesoController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Peso',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese un peso';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _alturaController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Altura',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese una altura';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _planetaController,
-            keyboardType: TextInputType.text,
-            decoration: const InputDecoration(
-              labelText: 'Planeta',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese un planeta';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _historiaController,
-            keyboardType: TextInputType.text,
-            decoration: const InputDecoration(
-              labelText: 'Historia',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese una historia';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _fuerzaController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Fuerza',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese una fuerza';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _inteligenciaController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Inteligencia',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese una inteligencia';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _agilidadController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Agilidad',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese una agilidad';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _resistenciaController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Resistencia',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese una resistencia';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _velocidadController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Velocidad',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingrese una velocidad';
-              }
-              return null;
-            },
-          ),
-          FutureBuilder<List<int>>(
-            future: PersonajeBLL.selectAllIds(),
-            builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
-              if (snapshot.hasData) {
-                return DropdownButtonFormField<int>(
-                  decoration: const InputDecoration(
-                    labelText: 'Id Película',
-                  ),
-                  items: snapshot.data!.asMap().entries.map((entry) {
-                    int idx = entry.key;
-                    int id = entry.value;
-                    return DropdownMenuItem<int>(
-                      value: idx,
-                      child: Text(id.toString()),
-                    );
-                  }).toList(),
-                  onChanged: (int? newValue) {
-                    setState(() {
-                      _idPeliculaController.text =
-                          snapshot.data![newValue!].toString();
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Por favor seleccione un id de película';
-                    }
-                    return null;
-                  },
-                );
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                return const CircularProgressIndicator();
-              }
-            },
-          ),
-          DropdownButtonFormField<int>(
-            decoration: const InputDecoration(
-              labelText: 'Tipo',
-            ),
-            items: const [
-              DropdownMenuItem(
-                value: 1,
-                child: Text("Héroe"),
+    return SingleChildScrollView(
+      // Agrega esta línea
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            TextFormField(
+              controller: _nombreController,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                labelText: 'Nombre',
               ),
-              DropdownMenuItem(
-                value: 2,
-                child: Text("Villano"),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese un nombre';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _nombreSuperheroeController,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                labelText: 'Nombre Superheroe',
               ),
-              DropdownMenuItem(
-                value: 3,
-                child: Text("Antivillano"),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese un nombre de superhéroe';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _edadController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Edad',
               ),
-            ],
-            onChanged: (int? newValue) {
-              setState(() {
-                _idTipoController.text = newValue.toString();
-              });
-            },
-            validator: (value) {
-              if (value == null) {
-                return 'Por favor seleccione un tipo';
-              }
-              return null;
-            },
-          ),
-          getButtonConDialog()
-        ],
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una edad';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _imagenController,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                labelText: 'Imagen',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una Imagen';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _pesoController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Peso',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese un peso';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _alturaController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Altura',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una altura';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _planetaController,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                labelText: 'Planeta',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese un planeta';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _historiaController,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                labelText: 'Historia',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una historia';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _fuerzaController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Fuerza',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una fuerza';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _inteligenciaController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Inteligencia',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una inteligencia';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _agilidadController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Agilidad',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una agilidad';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _resistenciaController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Resistencia',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una resistencia';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _velocidadController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Velocidad',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese una velocidad';
+                }
+                return null;
+              },
+            ),
+            /*FutureBuilder<List<int>>(
+              future: PersonajeBLL.selectAllIds(),
+              builder:
+                  (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
+                if (snapshot.hasData) {
+                  return DropdownButtonFormField<int>(
+                    decoration: const InputDecoration(
+                      labelText: 'Id Película',
+                    ),
+                    items: snapshot.data!.asMap().entries.map((entry) {
+                      int idx = entry.key;
+                      int id = entry.value;
+                      return DropdownMenuItem<int>(
+                        value: idx,
+                        child: Text(id.toString()),
+                      );
+                    }).toList(),
+                    onChanged: (int? newValue) {
+                      setState(() {
+                        _idPeliculaController.text =
+                            snapshot.data![newValue!].toString();
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Por favor seleccione un id de película';
+                      }
+                      return null;
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
+            ),*/
+            FutureBuilder<List<Tipo>>(
+              future: getTipos(),
+              builder:
+                  (BuildContext context, AsyncSnapshot<List<Tipo>> snapshot) {
+                if (snapshot.hasData) {
+                  return DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Tipo',
+                    ),
+                    items: snapshot.data!.map((Tipo tipo) {
+                      return DropdownMenuItem<String>(
+                        value: tipo.id.toString(),
+                        child: Text(tipo.nombre),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        if (newValue != null && isNumeric(newValue)) {
+                          _idTipoController.text = newValue;
+                        }
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor seleccione un tipo';
+                      }
+                      return null;
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
+            ),
+            getButtonConDialog()
+          ],
+        ),
       ),
     );
   }
@@ -331,7 +353,6 @@ class _PersonajeFormState extends State<PersonajeForm> {
             agilidad: int.parse(_agilidadController.text),
             resistencia: int.parse(_resistenciaController.text),
             velocidad: int.parse(_velocidadController.text),
-            idPelicula: int.parse(_idPeliculaController.text),
             idTipo: int.parse(_idTipoController.text),
           );
 

@@ -1,5 +1,8 @@
+import 'package:buscador_de_peliculas/bll/peliculas_personajes_bll.dart';
 import 'package:buscador_de_peliculas/bll/personaje_bll.dart';
+import 'package:buscador_de_peliculas/models/pelicula.dart';
 import 'package:buscador_de_peliculas/models/personaje.dart';
+import 'package:buscador_de_peliculas/pages/personajes/agregarpeliculaform_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -163,6 +166,67 @@ class _PersonajeDetallePage extends State<PersonajeDetallePage> {
               fontWeight: FontWeight.bold,
               fontSize: 20.0,
             ),
+          ),
+          FutureBuilder<List<Pelicula>>(
+            future:
+                PeliculasPersonajesBLL.getPeliculasPorPersonajeId(widget.id),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<Pelicula>> snapshot) {
+              if (snapshot.hasError) {
+                if (kDebugMode) {
+                  print(snapshot.error);
+                }
+                return const Center(
+                  child: Text('Error al cargar las películas del personaje'),
+                );
+              }
+              if (snapshot.hasData) {
+                return SizedBox(
+                  height: 200, // Ajusta la altura según tus necesidades
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: SizedBox(
+                          width: 160,
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(
+                                height: 160,
+                                child:
+                                    Image.network(snapshot.data![index].imagen),
+                              ), // Asume que tu modelo Pelicula tiene un campo imagen
+                              Text(snapshot.data![index]
+                                  .nombre), // Asume que tu modelo Pelicula tiene un campo nombre
+                              // Agrega más campos si es necesario
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (snapshot.data != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AgregarPeliculaPersonajeFormPage(
+                        idPersonaje: snapshot.data!.id!),
+                  ),
+                );
+              }
+            },
+            child: const Text('Agregar Película'),
           ),
         ],
       ),

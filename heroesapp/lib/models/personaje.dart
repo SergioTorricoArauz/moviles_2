@@ -23,8 +23,7 @@ class Personaje {
   int agilidad;
   int resistencia;
   int velocidad;
-  int idPelicula;
-  int idTipo;
+  int? idTipo;
 
   Personaje({
     this.id,
@@ -41,27 +40,25 @@ class Personaje {
     required this.agilidad,
     required this.resistencia,
     required this.velocidad,
-    required this.idPelicula,
     required this.idTipo,
   });
 
   factory Personaje.fromJson(Map<String, dynamic> json) => Personaje(
-        id: json["id"],
-        nombre: json["nombre"],
-        nombreSuperheroe: json["nombreSuperheroe"],
-        edad: json["edad"],
-        imagen: json["imagen"],
-        peso: json["peso"],
-        altura: json["altura"],
-        planeta: json["planeta"],
-        historia: json["historia"],
-        fuerza: json["fuerza"],
-        inteligencia: json["inteligencia"],
-        agilidad: json["agilidad"],
-        resistencia: json["resistencia"],
-        velocidad: json["velocidad"],
-        idPelicula: json["idPelicula"],
-        idTipo: json["idTipo"],
+        id: json["id"] ?? 0,
+        nombre: json["nombre"] ?? '',
+        nombreSuperheroe: json["nombreSuperheroe"] ?? '',
+        edad: json["edad"] ?? 0,
+        imagen: json["imagen"] ?? '',
+        peso: json["peso"] ?? 0,
+        altura: json["altura"] ?? 0,
+        planeta: json["planeta"] ?? '',
+        historia: json["historia"] ?? '',
+        fuerza: json["fuerza"] ?? 0,
+        inteligencia: json["inteligencia"] ?? 0,
+        agilidad: json["agilidad"] ?? 0,
+        resistencia: json["resistencia"] ?? 0,
+        velocidad: json["velocidad"] ?? 0,
+        idTipo: json["idTipo"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -79,7 +76,6 @@ class Personaje {
         "agilidad": agilidad,
         "resistencia": resistencia,
         "velocidad": velocidad,
-        "idPelicula": idPelicula,
         "idTipo": idTipo,
       };
 }

@@ -42,4 +42,21 @@ class PersonajeDAL {
         res.isNotEmpty ? res.map((c) => c["idPelicula"] as int).toList() : [];
     return list;
   }
+
+  static Future<List<Personaje>> selectByType(String tipo) async {
+    final db = await DatabaseProvider.database;
+    var res = await db.query("personaje", where: "tipo = ?", whereArgs: [tipo]);
+    List<Personaje> list =
+        res.isNotEmpty ? res.map((c) => Personaje.fromJson(c)).toList() : [];
+    return list;
+  }
+
+  static Future<List<Personaje>> searchPersonajes(String nombre) async {
+    final db = await DatabaseProvider.database;
+    var res = await db.query("personaje",
+        columns: ["nombre"], where: "nombre LIKE ?", whereArgs: ['%$nombre%']);
+    List<Personaje> list =
+        res.isNotEmpty ? res.map((c) => Personaje.fromJson(c)).toList() : [];
+    return list;
+  }
 }

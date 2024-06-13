@@ -34,4 +34,12 @@ class TipoDAL {
     var res = await db.delete("tipos", where: "id = ?", whereArgs: [id]);
     return res;
   }
+
+  static Future<List<int>> selectIds() async {
+    final db = await DatabaseProvider.database;
+    var res = await db.query("tipos", columns: ["id"]);
+    List<int> list =
+        res.isNotEmpty ? res.map((c) => c["id"] as int).toList() : [];
+    return list;
+  }
 }

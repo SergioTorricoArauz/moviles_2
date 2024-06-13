@@ -4,6 +4,8 @@ import 'package:buscador_de_peliculas/pages/peliculas/peliculaform_page.dart';
 import 'package:buscador_de_peliculas/pages/peliculas/peliculalist_page.dart';
 import 'package:buscador_de_peliculas/pages/personajes/personajeform_page.dart';
 import 'package:buscador_de_peliculas/pages/personajes/personajelist_page.dart';
+import 'package:buscador_de_peliculas/pages/tipos/tipoform_page.dart';
+import 'package:buscador_de_peliculas/pages/tipos/tiposlist_page.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -61,6 +63,19 @@ class MyApp extends StatelessWidget {
               } else if (parts.length == 2 && parts[2] == 'form') {
                 return MaterialPageRoute(
                     builder: (ctx) => const PeliculaForm());
+              }
+              break;
+            case 'tipo':
+              if (parts.length > 2 && parts[2] == 'form') {
+                var id = parts.length > 3 ? int.tryParse(parts[3]) : null;
+                return MaterialPageRoute(
+                    builder: (ctx) => TipoFormPage(id: id));
+              } else if (parts.length > 2 && parts[2] == 'list') {
+                return MaterialPageRoute(
+                    builder: (ctx) => const TipoListPage());
+              } else if (parts.length == 2 && parts[2] == 'form') {
+                return MaterialPageRoute(
+                    builder: (ctx) => const TipoFormPage());
               }
               break;
           }

@@ -1,5 +1,6 @@
 import 'package:buscador_de_peliculas/dal/pelicula_dal.dart';
 import 'package:buscador_de_peliculas/models/pelicula.dart';
+import 'package:buscador_de_peliculas/models/personaje.dart';
 
 class PeliculaBLL {
   static Future<List<Pelicula>> selectAll() async {
@@ -27,5 +28,11 @@ class PeliculaBLL {
 
   static Future<int> delete(int id) async {
     return await PeliculaDAL.delete(id);
+  }
+
+  static Future<List<Personaje>> selectByType(int idTipo) async {
+    var res = await PeliculaDAL.selectByType(idTipo);
+    List<Personaje> list = res.isNotEmpty ? res.map((c) => c).toList() : [];
+    return list;
   }
 }

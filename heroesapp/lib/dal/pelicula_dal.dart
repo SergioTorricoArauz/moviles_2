@@ -1,4 +1,5 @@
 import 'package:buscador_de_peliculas/models/pelicula.dart';
+import 'package:buscador_de_peliculas/models/personaje.dart';
 import 'package:buscador_de_peliculas/providers/database_provider.dart';
 
 class PeliculaDAL {
@@ -33,5 +34,14 @@ class PeliculaDAL {
     final db = await DatabaseProvider.database;
     var res = await db.delete("peliculas", where: "id = ?", whereArgs: [id]);
     return res;
+  }
+
+  static Future<List<Personaje>> selectByType(int idTipo) async {
+    final db = await DatabaseProvider.database;
+    var res =
+        await db.query("personaje", where: "idTipo = ?", whereArgs: [idTipo]);
+    List<Personaje> list =
+        res.isNotEmpty ? res.map((c) => Personaje.fromJson(c)).toList() : [];
+    return list;
   }
 }
